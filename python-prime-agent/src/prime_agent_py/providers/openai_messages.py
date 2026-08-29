@@ -122,25 +122,61 @@ def map_finish_reason(reason: str | None) -> str:
     return "stop"
 
 
+def _explicit_tool_call_index(item: Any) -> int | None:
+    """Return streaming `index` when present, including 0.
+
+    Non-streaming `message.tool_calls` items typically omit `index`. Defaulting
+    that to 0 would merge parallel calls into one slot.
+    """
+    if isinstance(item, dict):
+        if "index" not in item:
+            return None
+        raw = item.get("index")
+    elif hasattr(item, "index"):
+        raw = item.index
+    else:
+        return None
+    if raw is None or raw == "":
+        return None
+    return int(raw)
+
+
 class ToolCallAssembler:
     """Reassemble fragmented streamed tool-call JSON (OpenAI-style argument deltas)."""
 
     def __init__(self) -> None:
         self._by_index: dict[int, dict[str, str]] = {}
+        self._id_to_index: dict[str, int] = {}
         self._started: set[str] = set()
         self._ended: set[str] = set()
+
+    def _resolve_slot_index(self, item: Any, position: int) -> int:
+        explicit = _explicit_tool_call_index(item)
+        if explicit is not None:
+            return explicit
+        item_id = _attr(item, "id")
+        if item_id:
+            mapped = self._id_to_index.get(str(item_id))
+            if mapped is not None:
+                return mapped
+            index = position
+            while index in self._by_index:
+                index += 1
+            return index
+        return position
 
     def ingest(self, delta: Any) -> list[ModelEvent]:
         events: list[ModelEvent] = []
         tool_calls = _attr(delta, "tool_calls")
         if not tool_calls:
             return events
-        for item in tool_calls:
-            index = int(_attr(item, "index", 0) or 0)
+        for position, item in enumerate(tool_calls):
+            index = self._resolve_slot_index(item, position)
             slot = self._by_index.setdefault(index, {"id": "", "name": "", "arguments": ""})
             item_id = _attr(item, "id")
             if item_id:
                 slot["id"] = str(item_id)
+                self._id_to_index[str(item_id)] = index
             function = _attr(item, "function") or {}
             name = _attr(function, "name")
             if name:
@@ -150,6 +186,7 @@ class ToolCallAssembler:
                 slot["arguments"] += str(arguments)
             call_id = slot["id"] or f"call_{index}"
             slot["id"] = call_id
+            self._id_to_index[call_id] = index
             if call_id not in self._started and slot["name"]:
                 self._started.add(call_id)
                 events.append(ToolCallStartEvent(id=call_id, name=slot["name"]))
@@ -159,7 +196,6 @@ class ToolCallAssembler:
 
     def finalize(self) -> list[ModelEvent]:
         events: list[ModelEvent] = []
-        tool_calls: list[ToolCall] = []
         for index in sorted(self._by_index):
             slot = self._by_index[index]
             call_id = slot["id"] or f"call_{index}"
@@ -173,7 +209,6 @@ class ToolCallAssembler:
             except json.JSONDecodeError:
                 parsed = {"_raw": args_raw}
             call = ToolCall(id=call_id, name=slot["name"] or "unknown", arguments=parsed)
-            tool_calls.append(call)
             self._ended.add(call_id)
             events.append(ToolCallEndEvent(tool_call=call))
         return events

@@ -4,7 +4,7 @@ Phase 1 implements a **provider + agent loop + CLI** slice. Later phases add ker
 
 ## Layers
 
-```
+```text
 CLI (Typer + Rich)
   AgentRunner / agent loop
     ModelProvider (Protocol)

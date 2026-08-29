@@ -28,7 +28,7 @@ No layout deviations were required.
 | `packages/ai/src/api-registry.ts` | `prime_agent_py.providers.registry` | Profile registry: `provider_name` vs `litellm_model` vs `served_model_name`. |
 | `packages/ai/src/env-api-keys.ts` | `prime_agent_py.providers.credentials` | Env lookup + secret masking. No OAuth in Phase 1. |
 | `packages/ai/src/models.ts` / `models.generated.ts` | Not generated | Model catalogs stay in YAML profiles. |
-| `packages/agent/src/types.ts` | `prime_agent_py.agent.types` | Slim: tools, loop config. No declaration-merging custom messages. |
+| `packages/agent/src/types.ts` | `prime_agent_py.agent.loop` (`AgentLoopConfig`, `AgentTool`) + `prime_agent_py.models.tools` (`ToolDefinition`) | No `agent.types` module. No declaration-merging custom messages. |
 | `packages/agent/src/agent-loop.ts` | `prime_agent_py.agent.loop` | Minimal tool-call loop + usage aggregation. No steering/follow-up/continuation queues. |
 | `packages/agent/src/agent.ts` | `prime_agent_py.agent.runner` | Thin runner over the loop. |
 | `packages/coding-agent/src/core/usage.ts` | `prime_agent_py.models.usage` | `empty_usage` / `add_usage` / `clone_usage`. |
@@ -63,7 +63,7 @@ No layout deviations were required.
 
 ## Event flow (Phase 1)
 
-```
+```text
 CLI prompt
   -> AgentRunner.run
     -> ModelProvider.complete (normalized ModelEvent stream)

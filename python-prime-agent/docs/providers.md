@@ -32,3 +32,5 @@ If the process is down, the CLI prints provider name, endpoint, model, timeout, 
 ## Cloud examples
 
 `openrouter-free.yaml`, `gemini.yaml`, `groq.yaml`, `cerebras.yaml` document env var names only. Never commit keys. Quotas change; see vendor docs.
+
+`configs/openrouter-free.yaml` uses LiteLLM model `openrouter/openrouter/free` (OpenRouter native id `openrouter/free`). That is OpenRouter's free-model router, not a frozen list of slugs. Which models are free, and the quota, can change on the vendor side. `openrouter/auto` (`openrouter/openrouter/auto` in LiteLLM) can route to paid models and does not belong in this profile.
