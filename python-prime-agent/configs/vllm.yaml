@@ -1,0 +1,12 @@
+# vLLM OpenAI-compatible server. Unauthenticated remote vLLM is unsafe.
+
+default_provider: vllm
+
+providers:
+  vllm:
+    type: openai_compatible
+    model: openai/local-model
+    served_model_name: local-model
+    api_base: http://localhost:8000/v1
+    timeout_seconds: 120
+    max_retries: 0

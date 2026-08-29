@@ -1,0 +1,23 @@
+# Example shape only. Copy and edit. Do not commit secrets.
+
+default_provider: ollama
+
+providers:
+  ollama:
+    type: litellm
+    model: ollama/qwen3:30b
+    api_base: http://localhost:11434
+    timeout_seconds: 120
+    max_retries: 1
+    # Remote Ollama without auth is unsafe. Prefer localhost.
+
+  vllm:
+    type: openai_compatible
+    model: openai/local-model
+    served_model_name: local-model
+    api_base: http://localhost:8000/v1
+    timeout_seconds: 120
+
+  mock:
+    type: mock
+    model: mock-1

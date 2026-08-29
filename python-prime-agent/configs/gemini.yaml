@@ -1,0 +1,12 @@
+# Gemini via LiteLLM. Model ids and free quotas change; this file is an example only.
+# Set GEMINI_API_KEY. Never commit keys.
+
+default_provider: gemini
+
+providers:
+  gemini:
+    type: litellm
+    model: gemini/gemini-2.0-flash
+    api_key_env: GEMINI_API_KEY
+    timeout_seconds: 60
+    max_retries: 2

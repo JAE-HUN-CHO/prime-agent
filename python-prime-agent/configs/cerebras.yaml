@@ -1,0 +1,12 @@
+# Cerebras via LiteLLM. Free-tier limits change; this file is an example only.
+# Set CEREBRAS_API_KEY. Never commit keys.
+
+default_provider: cerebras
+
+providers:
+  cerebras:
+    type: litellm
+    model: cerebras/llama3.1-8b
+    api_key_env: CEREBRAS_API_KEY
+    timeout_seconds: 60
+    max_retries: 2

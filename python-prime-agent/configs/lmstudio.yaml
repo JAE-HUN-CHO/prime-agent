@@ -1,0 +1,12 @@
+# LM Studio local server. Unauthenticated remote LM Studio is unsafe.
+
+default_provider: lmstudio
+
+providers:
+  lmstudio:
+    type: openai_compatible
+    model: openai/local-model
+    served_model_name: local-model
+    api_base: http://localhost:1234/v1
+    timeout_seconds: 120
+    max_retries: 0
