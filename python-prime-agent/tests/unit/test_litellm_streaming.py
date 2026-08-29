@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from types import SimpleNamespace
+from tests.fixtures.streams import FakeStream, make_chunk, make_usage, text_stream
 
 from prime_agent_py.models.events import FinishEvent, TextDeltaEvent, UsageEvent
 from prime_agent_py.models.messages import UserMessage
 from prime_agent_py.providers.litellm_provider import LiteLLMProvider
 from prime_agent_py.providers.profiles import ProviderProfile
-from tests.fixtures.streams import FakeStream, make_chunk, make_usage, text_stream
 
 
 def _provider(acompletion: object) -> LiteLLMProvider:

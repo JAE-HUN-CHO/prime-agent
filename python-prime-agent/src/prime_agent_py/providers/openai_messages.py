@@ -6,7 +6,6 @@ from typing import Any
 
 from prime_agent_py.models.events import (
     ErrorEvent,
-    FinishEvent,
     ModelEvent,
     TextDeltaEvent,
     ThinkingDeltaEvent,
@@ -209,6 +208,7 @@ def classify_exception(exc: BaseException) -> ProviderError:
             "nodename nor servname",
             "temporarily unavailable",
             "failed to establish",
+            "cannot connect",
         )
     ):
         return ConnectionFailedError(text, cause=exc)

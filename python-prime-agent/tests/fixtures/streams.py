@@ -8,7 +8,14 @@ class FakeUsage(SimpleNamespace):
     pass
 
 
-def make_usage(*, prompt: int = 3, completion: int = 5, cached: int = 0, reasoning: int = 0, total: int | None = None) -> Any:
+def make_usage(
+    *,
+    prompt: int = 3,
+    completion: int = 5,
+    cached: int = 0,
+    reasoning: int = 0,
+    total: int | None = None,
+) -> Any:
     return SimpleNamespace(
         prompt_tokens=prompt,
         completion_tokens=completion,
@@ -32,7 +39,13 @@ def make_chunk(
     return SimpleNamespace(choices=[choice], usage=usage)
 
 
-def tool_delta(*, index: int = 0, call_id: str | None = None, name: str | None = None, arguments: str | None = None) -> Any:
+def tool_delta(
+    *,
+    index: int = 0,
+    call_id: str | None = None,
+    name: str | None = None,
+    arguments: str | None = None,
+) -> Any:
     return SimpleNamespace(
         index=index,
         id=call_id,

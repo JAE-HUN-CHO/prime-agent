@@ -45,7 +45,7 @@ packages = ["src/prime_agent_py"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = [".", "src"]
 
 [tool.ruff]
 line-length = 120
@@ -54,6 +54,9 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/prime_agent_py/cli/app.py" = ["B008"]
 
 [tool.mypy]
 python_version = "3.11"

@@ -91,7 +91,8 @@ class MockProvider:
             if isinstance(message, UserMessage):
                 last_user = message.content
                 break
-        if self.DETERMINISTIC_PROMPT.lower() in last_user.lower() or last_user.lower().strip() == self.DETERMINISTIC_PROMPT.lower():
+        lowered = last_user.lower()
+        if self.DETERMINISTIC_PROMPT.lower() in lowered or lowered.strip() == self.DETERMINISTIC_PROMPT.lower():
             return MockTurn(text=self.DETERMINISTIC_REPLY)
         return MockTurn(text=f"mock reply: {last_user}" if last_user else "mock reply")
 

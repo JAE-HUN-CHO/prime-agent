@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from prime_agent_py.providers.openai_messages import ToolCallAssembler
 from tests.fixtures.streams import tool_delta
+
+from prime_agent_py.providers.openai_messages import ToolCallAssembler
 
 
 def test_fragmented_tool_call_json() -> None:

@@ -27,9 +27,8 @@ async def test_mock_deterministic_prompt() -> None:
 @pytest.mark.asyncio
 async def test_mock_is_repeatable() -> None:
     provider = MockProvider()
-    first = [event async for event in provider.complete([UserMessage(content="Return a deterministic test response")], model="m")]
+    prompt = UserMessage(content="Return a deterministic test response")
+    first = [event async for event in provider.complete([prompt], model="m")]
     provider2 = MockProvider()
-    second = [
-        event async for event in provider2.complete([UserMessage(content="Return a deterministic test response")], model="m")
-    ]
+    second = [event async for event in provider2.complete([prompt], model="m")]
     assert [e.model_dump() for e in first] == [e.model_dump() for e in second]

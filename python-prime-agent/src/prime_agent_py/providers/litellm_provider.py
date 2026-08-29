@@ -9,7 +9,8 @@ from prime_agent_py.models.messages import AssistantMessage, Message, ToolCall
 from prime_agent_py.models.tools import ToolDefinition
 from prime_agent_py.models.usage import Usage
 from prime_agent_py.providers.credentials import resolve_api_key
-from prime_agent_py.providers.errors import RateLimitError, TimeoutError, diagnosis_for_profile
+from prime_agent_py.providers.errors import RateLimitError, diagnosis_for_profile
+from prime_agent_py.providers.errors import TimeoutError as ProviderTimeoutError
 from prime_agent_py.providers.openai_messages import (
     ToolCallAssembler,
     assistant_from_parts,
@@ -43,6 +44,7 @@ class LiteLLMProvider:
         if fn is None:
             import litellm
 
+            litellm.suppress_debug_info = True
             fn = litellm.acompletion
         return await fn(**kwargs)
 
@@ -76,6 +78,11 @@ class LiteLLMProvider:
             params["api_base"] = extra.pop("api_base")
         if api_key:
             params["api_key"] = api_key
+        elif self.profile.api_base and (
+            "localhost" in self.profile.api_base or "127.0.0.1" in self.profile.api_base
+        ):
+            # OpenAI-compatible local servers often require a placeholder key.
+            params["api_key"] = resolve_api_key("OPENAI_API_KEY") or "not-needed"
         openai_tools = tools_to_openai(tools)
         if openai_tools:
             params["tools"] = openai_tools
@@ -121,15 +128,15 @@ class LiteLLMProvider:
                 return
             except asyncio.CancelledError:
                 raise
-            except TimeoutError as exc:
+            except ProviderTimeoutError as exc:
                 last_error = exc
                 event = error_event_from_exc(exc)
                 if yielded or attempt >= retries:
                     yield event
                     yield self._finish_error_as_diag(exc)
                     return
-            except asyncio.TimeoutError as exc:
-                mapped = TimeoutError(f"provider timed out after {timeout}s", cause=exc)
+            except TimeoutError as exc:
+                mapped = ProviderTimeoutError(f"provider timed out after {timeout}s", cause=exc)
                 last_error = mapped
                 if yielded or attempt >= retries:
                     yield error_event_from_exc(mapped)

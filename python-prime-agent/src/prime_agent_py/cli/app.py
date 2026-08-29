@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -18,6 +17,11 @@ app = typer.Typer(no_args_is_help=True, add_completion=False)
 console = Console(stderr=False)
 
 
+@app.callback()
+def _cli() -> None:
+    """Python Prime Agent CLI (Phase 1)."""
+
+
 def main() -> None:
     app()
 
@@ -25,8 +29,8 @@ def main() -> None:
 @app.command("run")
 def run_command(
     prompt: str = typer.Argument(..., help="User prompt"),
-    provider: Optional[str] = typer.Option(None, "--provider", help="Profile name, or 'mock'"),
-    config: Optional[Path] = typer.Option(None, "--config", exists=False, help="YAML provider config"),
+    provider: str | None = typer.Option(None, "--provider", help="Profile name, or 'mock'"),
+    config: Path | None = typer.Option(None, "--config", exists=False, help="YAML provider config"),
 ) -> None:
     """Run one agent turn loop (Phase 1)."""
     configure_logging()
@@ -56,9 +60,11 @@ async def _run(prompt: str, *, provider_name: str | None, config_path: Path | No
                 console.print()
             console.print(f"[red]error:[/red] {event.message}")
             diag = getattr(provider, "diagnosis", None)
-            if callable(diag) and event.code in {"connection_failed", "timeout", "rate_limit"}:
+            if callable(diag) and (
+                event.code in {"connection_failed", "timeout", "rate_limit"} or "connect" in event.message.lower()
+            ):
                 console.print(diag(event.message))
-            elif event.code == "connection_failed" or "connect" in event.message.lower():
+            elif event.code in {"connection_failed", "timeout"} or "connect" in event.message.lower():
                 from prime_agent_py.providers.errors import diagnosis_for_profile
 
                 console.print(

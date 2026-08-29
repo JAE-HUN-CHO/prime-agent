@@ -12,7 +12,13 @@ async def test_rate_limit_error_handling_mocked() -> None:
         raise RateLimitError("free tier 429 rate limit", retry_after_seconds=1.0)
 
     provider = LiteLLMProvider(
-        ProviderProfile(type="litellm", model="openrouter/x", api_key_env="OPENROUTER_API_KEY", max_retries=0, timeout_seconds=5),
+        ProviderProfile(
+            type="litellm",
+            model="openrouter/x",
+            api_key_env="OPENROUTER_API_KEY",
+            max_retries=0,
+            timeout_seconds=5,
+        ),
         provider_name="openrouter",
         acompletion=acompletion,
     )

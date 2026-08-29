@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 import re
-from typing import Any
 
 _SECRET_ENV_HINTS = (
     "API_KEY",
