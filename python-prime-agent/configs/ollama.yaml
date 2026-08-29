@@ -1,0 +1,12 @@
+# Local Ollama. Remote/unauthenticated Ollama is not safe to expose.
+# This is not a sandbox.
+
+default_provider: ollama
+
+providers:
+  ollama:
+    type: litellm
+    model: ollama/qwen3:30b
+    api_base: http://localhost:11434
+    timeout_seconds: 120
+    max_retries: 0

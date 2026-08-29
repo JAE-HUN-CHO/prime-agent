@@ -1,0 +1,13 @@
+# Example OpenRouter profile. Free model slugs and quotas change; this file is not a guarantee.
+# Set OPENROUTER_API_KEY in the environment. Never commit keys.
+
+default_provider: openrouter
+
+providers:
+  openrouter:
+    type: litellm
+    model: openrouter/openrouter/auto
+    api_base: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    timeout_seconds: 60
+    max_retries: 2
